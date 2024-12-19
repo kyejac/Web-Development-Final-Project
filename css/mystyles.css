@@ -1,0 +1,61 @@
+.pic {
+    width: 75%;
+    object-fit: cover;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    border: 5px solid rgb(231, 136, 185);
+}
+
+body {
+    background-color: rgb(188, 218, 222);
+}
+
+h1 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: white;
+    font-size: 70px;
+}
+
+h2 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: white;
+    font-size: 40px;
+}
+
+.navbar {
+    position: relative;
+    padding: 10px;
+    color: white;
+}
+
+.navbar a{
+    color: white;
+}
+
+.sidebar {
+    background-color: white;
+    position: fixed;
+    top: 50px;
+    height: 100%;
+    width: 130px;
+    padding: 10px;
+}
+
+.sidebar a{
+    
+    color: rgb(231, 136, 185);
+}
+
+.text-container {
+    margin-left: 200px;
+    margin-right: 200px;
+    text-align: justify;
+    font-size: 18px;
+}
+
+.text-container a{
+    color: white;
+}
+
+

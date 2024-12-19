@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Time - Ball Hopper Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #277a98;
+        }
+
+        #game-container {
+            width: 900px;
+            height: 475px;
+            position: relative;
+            background-color: rgb(188, 218, 222);
+            overflow: hidden;
+            border: 2px solid #000;
+        }
+
+        #ball {
+            width: 30px;
+            height: 30px;
+            background-color: rgb(231, 136, 185);
+            position: absolute;
+            bottom: 20px;
+            left: 50px;
+            border-radius: 50%;
+        }
+
+        #obstacle {
+            width: 50px;
+            height: 30px;
+            background-color: #2b9fc9;
+            position: absolute;
+            bottom: 20px;
+            right: 0;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: black;
+        }
+
+        #start-btn, #play-again-btn {
+            position: absolute;
+            top: 190px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            display: block;
+        }
+
+        #start-btn:hover, #play-again-btn:hover {
+            background-color: #45a049;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #fff;
+            display: none;
+        }
+
+        #header {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            color: white;
+            margin-bottom: 20px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }   
+
+        #links {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            color: white;
+        }
+
+        #links a{
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="links">
+        <a class="links" href="../index.html">Home</a> |
+        <a class="links" href="fromscratchpage.html">Travel Blog</a>
+    </div>
+    
+    <div id="header">
+        <h1>Ball Hopper Game</h1>
+        <p>Welcome to the Ball Hopper game. Can you beat your high score?</p>
+    </div>
+
+<div>
+    <div id="game-container">
+        <div id="ball"></div>
+        <div id="obstacle"></div>
+        <div id="score">Score: 0</div>
+        <button id="start-btn">Start</button>
+        <button id="play-again-btn" style="display: none;">Play Again</button>
+        <div id="game-over">Game Over!</div>
+    </div>
+
+    <script>
+        let ball = document.getElementById('ball');
+        let obstacle = document.getElementById('obstacle');
+        let scoreDisplay = document.getElementById('score');
+        let gameContainer = document.getElementById('game-container');
+        let startButton = document.getElementById('start-btn');
+        let playAgainButton = document.getElementById('play-again-btn');
+        let gameOverMessage = document.getElementById('game-over');
+
+        let score = 0;
+        let isJumping = false;
+        let jumpHeight = 100;
+        let gravity = 2;
+        let ballPosition = 20;
+        let obstaclePosition = 600;
+        let gameOver = false;
+
+        function moveObstacle() {
+            if (gameOver) return;
+            obstaclePosition -= 5;
+            if (obstaclePosition < -50) {
+                obstaclePosition = gameContainer.offsetWidth;
+                score++;
+            }
+            obstacle.style.left = obstaclePosition + 'px';
+        }
+
+        function jump() {
+            if (isJumping || gameOver) return;
+            isJumping = true;
+
+            let jumpUpInterval = setInterval(() => {
+                if (ballPosition < jumpHeight) {
+                    ballPosition += 5;
+                    ball.style.bottom = ballPosition + 'px';
+                } else {
+                    clearInterval(jumpUpInterval);
+
+                    let jumpDownInterval = setInterval(() => {
+                        if (ballPosition > 20) {
+                            ballPosition -= 5;
+                            ball.style.bottom = ballPosition + 'px';
+                        } else {
+                            clearInterval(jumpDownInterval);
+                            isJumping = false;
+                            checkCollision();
+                        }
+                    }, 20);
+                }
+            }, 20);
+        }
+
+        // Updated checkCollision function to ensure game ends whenever the ball touches the obstacle
+        function checkCollision() {
+            // Check if the ball overlaps with the obstacle (both horizontally and vertically)
+            let ballRight = ballPosition + 30; // Ball's rightmost point
+            let obstacleRight = obstaclePosition + 50; // Obstacle's rightmost point
+
+            if (ballPosition <= 20 && 
+                obstaclePosition <= ballPosition + 30 && 
+                obstacleRight >= ballPosition) {
+                // Ball touches the obstacle when it's on the ground or in the air
+                gameOver = true;
+                scoreDisplay.textContent = "Final Score: " + score;
+                gameOverMessage.style.display = "block";
+                playAgainButton.style.display = "block"; // Show Play Again button
+            } else {
+                scoreDisplay.textContent = "Score: " + score;
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                jump();
+            }
+        });
+
+        function gameLoop() {
+            if (gameOver) return;
+            moveObstacle();
+            checkCollision();  // Added this check inside the game loop to detect collisions continuously
+            requestAnimationFrame(gameLoop);
+        }
+
+        startButton.addEventListener('click', () => {
+            score = 0;
+            ballPosition = 20;
+            obstaclePosition = 600;
+            gameOver = false;
+            scoreDisplay.textContent = "Score: " + score;
+            gameOverMessage.style.display = "none";
+            playAgainButton.style.display = "none"; // Hide Play Again button
+            gameLoop(); // Start the game loop
+            startButton.style.display = "none"; // Hide the start button
+        });
+
+        playAgainButton.addEventListener('click', () => {
+            score = 0;
+            ballPosition = 20;
+            obstaclePosition = 600;
+            gameOver = false;
+            scoreDisplay.textContent = "Score: " + score;
+            gameOverMessage.style.display = "none";
+            playAgainButton.style.display = "none"; // Hide Play Again button
+            gameLoop(); // Restart the game loop
+        });
+    </script>
+</div>
+</body>
+</html>
